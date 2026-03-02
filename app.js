@@ -1152,7 +1152,7 @@ function populateLeasingTable() {
             <td>${canceled}</td>
             <td>${denied}</td>
             <td>${netLeases}</td>
-            <td>${formatPercent(closingRatio)}</td>
+            <td>${formatPercent(closingRatio, true)}</td>
             <td>${formatPercent(gainPercent)}</td>
         `;
         tbody.appendChild(tr);
@@ -1179,7 +1179,7 @@ function populateLeasingTable() {
     document.getElementById('leasing-total-canceled').textContent = totals.canceled;
     document.getElementById('leasing-total-denied').textContent = totals.denied;
     document.getElementById('leasing-total-net').textContent = totals.netLeases;
-    document.getElementById('leasing-total-ratio').textContent = formatPercent(totalClosingRatio);
+    document.getElementById('leasing-total-ratio').textContent = formatPercent(totalClosingRatio, true);
     document.getElementById('leasing-total-gain').textContent = formatPercent(totalGain);
 }
 
@@ -1462,16 +1462,19 @@ function populateReviewsTable() {
 }
 
 // Format helpers
-function formatPercent(value) {
-    // Ensure the value is treated as a percentage (multiply by 100 if it's a decimal)
+// asDecimalRatio: when true, value is gross/visits (or similar ratio) - always multiply by 100.
+//   Use for Closing Ratio, which can exceed 100% (e.g. 11 leases / 5 visits = 220%).
+function formatPercent(value, asDecimalRatio) {
     let percentValue = parseFloat(value) || 0;
     
-    // Determine if value is a decimal ratio or already a percentage:
-    // - Values with absolute value <= 2.0 are treated as decimal ratios (covers 0.25, 1.0, 1.33, -0.15, -1.0, -2.0)
-    // - Values with absolute value > 2.0 are treated as already percentages (covers 8.8, 94.9, -100.0)
-    // This handles closing ratios > 100% (like 1.33 → 133%) while preserving data percentages (like 8.8 → 8.8%)
-    if (Math.abs(percentValue) <= 2.0 && percentValue !== 0) {
+    if (asDecimalRatio) {
+        // Always treat as decimal ratio (e.g. closing ratio = gross/visits)
         percentValue = percentValue * 100;
+    } else {
+        // Heuristic: values with abs <= 2.0 are decimal ratios; > 2.0 are already percentages
+        if (Math.abs(percentValue) <= 2.0 && percentValue !== 0) {
+            percentValue = percentValue * 100;
+        }
     }
     
     return percentValue.toFixed(1) + '%';
