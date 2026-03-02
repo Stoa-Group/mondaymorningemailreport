@@ -1,0 +1,279 @@
+<html><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monday Morning Report - Stoa Group</title>
+    <link rel="stylesheet" href="app.css">
+    <!-- html2pdf library for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- pdf.js for PDF manipulation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <!-- pdf-lib for PDF merging -->
+    <script src="https://unpkg.com/pdf-lib@^1.0.0"></script>
+    <!-- SheetJS with style support for Excel export -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.min.js"></script>
+  </head>
+  <body>
+    <div class="container" id="report-container">
+        <!-- Header -->
+        <header class="report-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <img src="STOA20-Logo-OneColor-Grey.jpg" alt="Stoa Group Logo" class="logo">
+                </div>
+                <div class="header-title">
+                    <h1>Monday Morning Report</h1>
+                    <div id="report-date" class="date-display">Week Of: Loading...</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Export Button -->
+        <div class="export-controls">
+            <button id="export-pdf-btn" class="btn-export">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                Export as PDF
+            </button>
+            <button id="export-excel-btn" class="btn-export">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="16" rx="2" ry="2"></rect>
+                    <path d="M10 9l4 6m0-6l-4 6"></path>
+                </svg>
+                Export as Excel
+            </button>
+        </div>
+
+        <!-- Report Sections -->
+        <main class="report-content">
+            <!-- Occupancy Section -->
+            <section class="report-section" id="occupancy-section">
+                <h2 class="section-title">Occupancy</h2>
+                <div class="table-container">
+                    <table id="occupancy-table" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Property</th>
+                                <th>Location</th>
+                                <th>Total Units</th>
+                                <th>Current<br>Occupancy %</th>
+                                <th>Budgeted<br>Occupancy %</th>
+                                <th>Delta (Units)</th>
+                                <th>4 Week<br>Projection</th>
+                                <th>8 Week<br>Projection</th>
+                                <th>Move-Ins</th>
+                                <th>Move-Outs</th>
+                                <th>%<br>Gain/Loss</th>
+                            </tr>
+                        </thead>
+                        <tbody id="occupancy-tbody">
+                            <!-- Data will be inserted here -->
+                        </tbody>
+                        <tfoot id="occupancy-footer">
+                            <tr class="total-row">
+                                <td colspan="2"><strong>Overall Total</strong></td>
+                                <td id="total-units">0</td>
+                                <td id="current-occupancy">0%</td>
+                                <td id="budgeted-occupancy">0%</td>
+                                <td id="total-delta">0</td>
+                                <td id="week-4-proj">0%</td>
+                                <td id="week-8-proj">0%</td>
+                                <td id="total-move-ins">0</td>
+                                <td id="total-move-outs">0</td>
+                                <td id="gain-loss">0%</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Leasing Section -->
+            <section class="report-section" id="leasing-section">
+                <h2 class="section-title">Leasing</h2>
+                <div class="table-container">
+                    <table id="leasing-table" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Property</th>
+                                <th>Location</th>
+                                <th>Total Units</th>
+                                <th>Current<br>Leased %</th>
+                                <th>Visits</th>
+                                <th>Gross Leased</th>
+                                <th>Canceled</th>
+                                <th>Denied</th>
+                                <th>Net Leases</th>
+                                <th>Closing<br>Ratio</th>
+                                <th>%<br>Gain</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leasing-tbody">
+                            <!-- Data will be inserted here -->
+                        </tbody>
+                        <tfoot id="leasing-footer">
+                            <tr class="total-row">
+                                <td colspan="2"><strong>Overall Total</strong></td>
+                                <td id="leasing-total-units">0</td>
+                                <td id="leasing-avg">0%</td>
+                                <td id="leasing-total-visits">0</td>
+                                <td id="leasing-total-gross">0</td>
+                                <td id="leasing-total-canceled">0</td>
+                                <td id="leasing-total-denied">0</td>
+                                <td id="leasing-total-net">0</td>
+                                <td id="leasing-total-ratio">0%</td>
+                                <td id="leasing-total-gain">0%</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Renewals and Collections Section -->
+            <section class="report-section" id="renewals-section">
+                <h2 class="section-title">Renewals &amp; Collections</h2>
+                <div class="table-container">
+                    <table id="renewals-table" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Property</th>
+                                <th>Location</th>
+                                <th>Total Units</th>
+                                <th>T-12 Expired</th>
+                                <th>T-12 Renewed</th>
+                                <th>Renewal<br>Rate</th>
+                                <th>In-Service<br>Units</th>
+                                <th>Delinquent</th>
+                                <th>%<br>Delinquent</th>
+                            </tr>
+                        </thead>
+                        <tbody id="renewals-tbody">
+                            <!-- Data will be inserted here -->
+                        </tbody>
+                        <tfoot id="renewals-footer">
+                            <tr class="total-row">
+                                <td colspan="2"><strong>Overall Total</strong></td>
+                                <td id="renewals-total-units">0</td>
+                                <td id="renewals-total-expired">0</td>
+                                <td id="renewals-total-renewed">0</td>
+                                <td id="renewals-avg-rate">0%</td>
+                                <td id="renewals-total-service">0</td>
+                                <td id="renewals-total-delinquent">0</td>
+                                <td id="renewals-avg-delinquent">0%</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Rents/SF Section -->
+            <section class="report-section" id="rentsf-section">
+                <h2 class="section-title">Rents/SF</h2>
+                <div class="table-container">
+                    <table id="rentsf-table" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Property</th>
+                                <th>Location</th>
+                                <th>Total Units</th>
+                                <th>Occupied<br>Rent/SF</th>
+                                <th>Budgeted<br>Rent/SF</th>
+                                <th>%<br>Difference</th>
+                                <th>Move-in<br>Rent/SF</th>
+                                <th>% vs<br>Budget</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rentsf-tbody">
+                            <!-- Data will be inserted here -->
+                        </tbody>
+                        <tfoot id="rentsf-footer">
+                            <tr class="total-row">
+                                <td colspan="2"><strong>Overall Total</strong></td>
+                                <td id="rentsf-total-units">0</td>
+                                <td id="rentsf-avg-occupied">$0.00</td>
+                                <td id="rentsf-avg-budgeted">$0.00</td>
+                                <td id="rentsf-avg-diff">0%</td>
+                                <td id="rentsf-avg-movein">$0.00</td>
+                                <td id="rentsf-avg-compared">0%</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Rents Section -->
+            <section class="report-section" id="rents-section">
+                <h2 class="section-title">Rents</h2>
+                <div class="table-container">
+                    <table id="rents-table" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Property</th>
+                                <th>Location</th>
+                                <th>Total Units</th>
+                                <th>Occupied<br>Rent</th>
+                                <th>Budgeted<br>Rent</th>
+                                <th>%<br>Difference</th>
+                                <th>Move-In<br>Rent</th>
+                                <th>Move-In vs<br>Budget %</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rents-tbody">
+                            <!-- Data will be inserted here -->
+                        </tbody>
+                        <tfoot id="rents-footer">
+                            <tr class="total-row">
+                                <td colspan="2"><strong>Overall Total</strong></td>
+                                <td id="rents-total-units">0</td>
+                                <td id="rents-avg-occupied">$0</td>
+                                <td id="rents-avg-budgeted">$0</td>
+                                <td id="rents-avg-diff">0%</td>
+                                <td id="rents-avg-movein">$0</td>
+                                <td id="rents-avg-movein-diff">0%</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Income Section -->
+            <section class="report-section" id="income-section">
+                <h2 class="section-title">Income</h2>
+                <div class="table-container">
+                    <table id="income-table" class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Property</th>
+                                <th>Location</th>
+                                <th>Total Units</th>
+                                <th>Current Month<br>Income</th>
+                                <th>Budgeted<br>Income</th>
+                                <th>%<br>Difference</th>
+                            </tr>
+                        </thead>
+                        <tbody id="income-tbody">
+                            <!-- Data will be inserted here -->
+                        </tbody>
+                        <tfoot id="income-footer">
+                            <tr class="total-row">
+                                <td colspan="2"><strong>Overall Total (Excluding Missing Data)</strong></td>
+                                <td id="income-total-units">0</td>
+                                <td id="income-current-total">$0</td>
+                                <td id="income-budgeted-total">$0</td>
+                                <td id="income-total-diff">0%</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </section>
+
+            
+        </main>
+    </div>
+
+    <!-- Load external scripts -->
+    <script src="https://unpkg.com/ryuu.js@4.6.0/dist/domo.js" integrity="sha384-YYsd9wQ+wDlUWhvpfGdptxmNYIqBC+52oJtWgPKJadbs3sSFTY/+ZotPbEHTTRWz" crossorigin="anonymous"></script>
+    <script src="app.js"></script>
+  
+</body></html>
