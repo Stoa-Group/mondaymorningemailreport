@@ -947,7 +947,6 @@ function filterToMostRecentWeek(data) {
         return [];
     }
     
-    // Filter by status first
     const statusFiltered = data.filter(function(row) {
         return row.Status === 'Lease-Up' || row.Status === 'Stabilized';
     });
