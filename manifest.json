@@ -2,7 +2,13 @@
   "id": "64357d2e-3916-45a6-9574-f0c88e057f25",
   "name": "Monday Morning Email Report",
   "version": "0.0.1",
-  "ignore": ["SampleReports/**", "SampleReports", "README.md", ".git/**", ".github/**"],
+  "ignore": [
+    "SampleReports/**",
+    "SampleReports",
+    "README.md",
+    ".git/**",
+    ".github/**"
+  ],
   "datasetsMapping": [
     {
       "dataSetId": "b666b357-41f6-441e-92ee-7700fa575517",
