@@ -272,8 +272,17 @@
         </main>
     </div>
 
-    <!-- Load external scripts -->
-    <script src="https://unpkg.com/ryuu.js@4.6.0/dist/domo.js" integrity="sha384-YYsd9wQ+wDlUWhvpfGdptxmNYIqBC+52oJtWgPKJadbs3sSFTY/+ZotPbEHTTRWz" crossorigin="anonymous"></script>
+    <!-- Load external scripts. Domo: on localhost use stub (avoids SES/getAttribute errors); in Domo load real SDK. -->
+    <script>
+      (function(){
+        var isLocal = typeof window !== 'undefined' && window.location && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+        if (isLocal) {
+          window.domo = { get: function(){ return Promise.reject(new Error('Monday Morning Email Report requires Domo. Open this app from your Domo dashboard.')); } };
+        } else {
+          document.write('<script src="https://unpkg.com/ryuu.js@4.6.0/dist/domo.js" integrity="sha384-YYsd9wQ+wDlUWhvpfGdptxmNYIqBC+52oJtWgPKJadbs3sSFTY/+ZotPbEHTTRWz" crossorigin="anonymous"><\/script>');
+        }
+      })();
+    </script>
     <script src="app.js"></script>
   
 </body></html>
