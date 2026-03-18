@@ -875,28 +875,62 @@ function getWeekEndingDate() {
     return weekEnding.toISOString().split('T')[0];
 }
 
+// PropertyList API: fetch authoritative Status from the database
+var PROPERTY_LIST_API = "https://stoagroupdb-ddre.onrender.com/api/leasing/property-list";
+
+function fetchPropertyListStatus() {
+    return fetch(PROPERTY_LIST_API)
+        .then(function(res) {
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.json();
+        })
+        .then(function(json) {
+            var map = {};
+            (json.data || []).forEach(function(p) {
+                var name = (p.Property || '').trim().toLowerCase();
+                if (name) map[name] = (p.Status || '').trim();
+            });
+            console.log('[PropertyList] Loaded ' + Object.keys(map).length + ' authoritative statuses from DB');
+            return map;
+        })
+        .catch(function(e) {
+            console.warn('[PropertyList] Could not fetch DB statuses, using Domo Status as-is:', e);
+            return {};
+        });
+}
+
+function overlayDbStatus(rows, statusMap) {
+    if (!statusMap || Object.keys(statusMap).length === 0) return rows;
+    rows.forEach(function(r) {
+        var prop = (r.Property || '').toString().trim().toLowerCase();
+        if (prop && statusMap[prop]) {
+            r.Status = statusMap[prop];
+        }
+    });
+    return rows;
+}
+
 // Load data from Domo
 function loadData() {
-// Some DataSets are massive and will bring any web browser to its knees if you
-// try to load the entire thing. To keep your app performing optimally, take
-// advantage of filtering, aggregations, and group by's to bring down just the
-// data your app needs. Do not include all columns in your data mapping file,
-// just the ones you need.
-//
-// For additional documentation on how you can query your data, please refer to
-// https://developer.domo.com/portal/8s3y9eldnjq8d-data-api
+    // Fetch PropertyList (DB authoritative status) in parallel with MMR data
+    Promise.all([
+        domo.get('/data/v2/MMRDATA?limit=10000'),
+        fetchPropertyListStatus()
+    ])
+        .then(function(results) {
+            var data = results[0];
+            var dbStatus = results[1];
 
-// domo refers to the included ryuu.js from the index.html file
-    // Using dataset alias from manifest
-    domo.get('/data/v2/MMRDATA?limit=10000')
-        .then(function(data){
             console.log("mmrData", data);
-            let allData = data;
+            var allData = data;
             
             if (!allData || allData.length === 0) {
                 showError('No data received from mmrData dataset.');
                 return;
             }
+
+            // Overlay authoritative Status from database before filtering
+            overlayDbStatus(allData, dbStatus);
             
             // Filter to only the most recent week
             mmrData = filterToMostRecentWeek(allData);
@@ -907,8 +941,8 @@ function loadData() {
             }
             
             // Update report date with the actual ReportDate from data
-            const actualReportDate = mmrData[0].ReportDate || getWeekEndingDate();
-            document.getElementById('report-date').textContent = `Week Of: ${actualReportDate}`;
+            var actualReportDate = mmrData[0].ReportDate || getWeekEndingDate();
+            document.getElementById('report-date').textContent = 'Week Of: ' + actualReportDate;
             
             // Process and display data
             populateOccupancyTable();
@@ -917,10 +951,9 @@ function loadData() {
             populateRentsTable();
             populateRentsFTable();
             populateIncomeTable();
-            // populateReviewsTable(); // Commented out per request
         })
         .catch(function(error) {
-            console.error('Error loading mmrData:', error);
+            console.error('Error loading data:', error);
             showError('Failed to load data: ' + (error.message || error.toString()));
         });
     
