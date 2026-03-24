@@ -1472,10 +1472,15 @@ function populateReviewsTable() {
         city: row.City,
         state: row.State,
         totalUnits: parseInt(row.TotalUnits || 0),
+        birthOrder: parseInt(row.BirthOrder || 0, 10),
         rating: propertyRatings[row.Property] ? 
                 (propertyRatings[row.Property].total / propertyRatings[row.Property].count) : 
                 (4.5 + Math.random() * 0.5) // Placeholder rating
-    })).sort((a, b) => b.rating - a.rating);
+    })).sort((a, b) => {
+        const d = (a.birthOrder || 0) - (b.birthOrder || 0);
+        if (d !== 0) return d;
+        return String(a.property || '').localeCompare(String(b.property || ''));
+    });
     
     sortedProperties.forEach(function(item) {
         const tr = document.createElement('tr');
