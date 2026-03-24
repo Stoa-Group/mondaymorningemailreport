@@ -1061,7 +1061,9 @@ function populateOccupancyTable() {
         
         const actualOccupiedUnits = Math.round(totalUnitsValue * actualOccupancyValue);
         const budgetedOccupiedUnits = Math.round(totalUnitsValue * budgetedOccupancyValue);
-        const delta = actualOccupiedUnits - budgetedOccupiedUnits;
+        let delta = actualOccupiedUnits - budgetedOccupiedUnits;
+        // Align with Leasing Analytics Hub: at 0% occupancy, delta vs budget is 0 (not a large negative)
+        if (actualOccupiedUnits === 0 || toNumber(occupancyPercent) === 0) delta = 0;
         
         // Use Week4 data for projection
         const week4Proj = toNumber(row.Week4OccPercent) || 0;
